@@ -3,6 +3,7 @@ import logging
 import schedule
 import time
 import os
+import json
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -15,11 +16,6 @@ now = time.strftime("%d-%m-%Y-%H-%M")
 logging.basicConfig(filename="./logs/main" + now + ".log", format=' [ %(asctime)s ] [ %(levelname)s ] %(message)s',
                     encoding="utf-8", level=logging.DEBUG)
 
-# Data
-username = "" # Username/Email eingeben
-pw = "" # Passwort eingeben
-msg = "Morgen"  # Hier die Nachricht, die versendet werden soll eintragen!
-
 # Web Driver
 options = Options()
 options.add_argument('--headless')
@@ -29,7 +25,26 @@ driver.get("https://homeworker.li/auth")
 
 # Functions
 def login():
+    os.system("cls")
+
+    try:
+        with open("LoginInfo.json", "r") as f:
+            LoginData = json.load(f)
+            username = LoginData["username"]
+            pw = LoginData["pw"]
+            f.close()
+        print(username + " ; " + pw)
+    except:
+        username = str(input("E-Mail: "))
+        pw = str(input("Passwort: "))
+        jsonDict = {"username": username, "pw": pw}
+        print(username + " ; " + pw)
+        with open("LoginInfo.json", "w") as f:
+            json.dump(jsonDict, f)
+            f.close()
+
     print("Logging in!")
+    time.sleep(5)
 
     # Accept Cookies
     driver.find_element_by_xpath("/html/body/div[4]/div/div[6]/span[2]").click()
@@ -46,13 +61,22 @@ def login():
 
     logging.info("Succesfully Logged in!")
     print("Logged in!")
-    time.sleep(5)
+
+    time.sleep(10)
+
+    try:
+        alert = driver.switch_to.alert
+        alert.accept()
+    except:
+        pass
+
+    time.sleep(10)
     driver.refresh()
     time.sleep(5)
     os.system("cls")
 
 
-def writeInChat(ChatFach):
+def writeInChat(ChatFach, msg="Morgen"):
     print("Start Writing MSG to Chat: " + ChatFach + "!")
     driver.refresh()
     time.sleep(10)
@@ -90,7 +114,7 @@ def runSchedule():
     # Dienstag - Done
     schedule.every().tuesday.at("08:03").do(lambda: writeInChat("10b Mathe scf"))  # Mathe
     schedule.every().tuesday.at("09:47").do(lambda: writeInChat("10b Bio Mössinger"))  # Biologie
-    schedule.every().tuesday.at("11:33").do(lambda: writeInChat("10b Englisch Janker"))  # Englisch
+    schedule.every().tuesday.at("11:33").do(lambda: writeInChat("10b Englisch Janker", "Morning"))  # Englisch
 
     # Mittwoch - Done
     schedule.every().wednesday.at("08:03").do(lambda: writeInChat("10b wr und geo"))  # Wirtschaft und Recht
@@ -107,7 +131,7 @@ def runSchedule():
     # Freitag - Done
     schedule.every().friday.at("08:03").do(lambda: writeInChat("10b Physik"))  # Physik
     schedule.every().friday.at("09:47").do(lambda: writeInChat("10b Mathe scf"))  # Mathe
-    schedule.every().friday.at("10:33").do(lambda: writeInChat("10b Englisch Janker"))  # Englisch
+    schedule.every().friday.at("10:33").do(lambda: writeInChat("10b Englisch Janker", "Morning"))  # Englisch
     schedule.every().friday.at("11:33").do(lambda: writeInChat("10b wr und geo"))  # Geographie
 
     # Run
