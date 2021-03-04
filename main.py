@@ -92,7 +92,7 @@ def writeInChat(ChatFach, msg="Morgen"):
     time.sleep(5)
 
     # Send Message in Chat
-    driver.find_element_by_xpath("//*[@id='new-text-message']").send_keys(msg)
+    driver.find_element_by_xpath("//*[@id='new-text-message']").send_keys(msg, Keys.RETURN)
 
     chatName = driver.find_element_by_xpath("//*[@id='chat-name']").text
     timeNow = time.strftime("%H:%M")
