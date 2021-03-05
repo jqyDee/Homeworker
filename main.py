@@ -19,7 +19,10 @@ class HomeworkerBot:
         self.now = time.strftime("%d-%m-%Y-%H-%M")
 
         # Logging
-        self.logging()
+        self.checkLogDir()
+        logging.basicConfig(filename="./logs/main" + self.now + ".log",
+                            format=' [ %(asctime)s ] [ %(levelname)s ] %(message)s',
+                            encoding="utf-8", level=logging.DEBUG)
 
         # Web Driver
         options = Options()
@@ -33,15 +36,11 @@ class HomeworkerBot:
         self.runSchedule()
 
     # Functions
-    def logging(self):
+    def checkLogDir(self):
         currentDir = os.getcwd()
         finalDir = os.path.join(currentDir, r'logs')
         if not path.exists(finalDir):
             os.makedirs(finalDir)
-
-        logging.basicConfig(filename="./logs/main" + self.now + ".log",
-                            format=' [ %(asctime)s ] [ %(levelname)s ] %(message)s',
-                            encoding="utf-8", level=logging.DEBUG)
 
     def login(self):
         os.system("cls")
