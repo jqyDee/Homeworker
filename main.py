@@ -157,6 +157,8 @@ class HomeworkerBot:
         while True:
             schedule.run_pending()
             time.sleep(1)
+    
+    # Add when Class destroyed
 
 if __name__== "__main__":
     HomeworkerBot()
