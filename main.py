@@ -4,28 +4,28 @@ import schedule
 import time
 import os
 import json
+import os.path
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
+from os import path
 
 
 class HomeworkerBot:
 
     def __init__(self):
         # Time
-        now = time.strftime("%d-%m-%Y-%H-%M")
+        self.now = time.strftime("%d-%m-%Y-%H-%M")
 
         # Logging
-        logging.basicConfig(filename="./logs/main" + now + ".log",
-                            format=' [ %(asctime)s ] [ %(levelname)s ] %(message)s',
-                            encoding="utf-8", level=logging.DEBUG)
+        self.logging()
 
         # Web Driver
         options = Options()
         options.add_argument('')
         self.driver = webdriver.Firefox(executable_path=r"./geckodriver.exe", options=options,
-                                   log_path="./logs/geckodriver" + now
+                                   log_path="./logs/geckodriver" + self.now
                                             + ".log")
         self.driver.get("https://homeworker.li/auth")
 
@@ -33,6 +33,16 @@ class HomeworkerBot:
         self.runSchedule()
 
     # Functions
+    def logging(self):
+        currentDir = os.getcwd()
+        finalDir = os.path.join(currentDir, r'logs')
+        if not path.exists(finalDir):
+            os.makedirs(finalDir)
+
+        logging.basicConfig(filename="./logs/main" + self.now + ".log",
+                            format=' [ %(asctime)s ] [ %(levelname)s ] %(message)s',
+                            encoding="utf-8", level=logging.DEBUG)
+
     def login(self):
         os.system("cls")
 
@@ -149,4 +159,5 @@ class HomeworkerBot:
             schedule.run_pending()
             time.sleep(1)
 
-HomeworkerBot()
+if __name__== "__main__":
+    HomeworkerBot()
