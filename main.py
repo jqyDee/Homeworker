@@ -26,7 +26,7 @@ class HomeworkerBot:
 
         # Web Driver
         options = Options()
-        options.add_argument('')
+        options.add_argument('--headless')
         self.driver = webdriver.Firefox(executable_path=r"./geckodriver.exe", options=options,
                                    log_path="./logs/geckodriver" + self.now
                                             + ".log")
