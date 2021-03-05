@@ -19,7 +19,8 @@ logging.basicConfig(filename="./logs/main" + now + ".log", format=' [ %(asctime)
 # Web Driver
 options = Options()
 options.add_argument('--headless')
-driver = webdriver.Firefox(options=options, log_path="./logs/geckodriver" + now + ".log")
+driver = webdriver.Firefox(executable_path=r"./geckodriver.exe", options=options, log_path="./logs/geckodriver" + now
+                                                                                           + ".log")
 driver.get("https://homeworker.li/auth")
 
 
