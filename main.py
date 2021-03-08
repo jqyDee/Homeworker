@@ -53,12 +53,12 @@ class HomeworkerBot:
                 pw = logindata["pw"]
                 f.close()
             print(username + " ; " + pw)
-        except FileNotFoundError:
+        except (FileNotFoundError, json.decoder.JSONDecodeError):
             username = str(input("E-Mail: "))
             pw = str(input("Passwort: "))
             jsondict = {"username": username, "pw": pw}
             print(username + " ; " + pw)
-            with open("user/data/LoginInfo.json", "w") as f:
+            with open("./user/data/LoginInfo.json", "w") as f:
                 json.dump(jsondict, f)
                 f.close()
 
