@@ -1,10 +1,8 @@
-# Import
 import logging
 import schedule
 import time
-import os
+import os, os.path
 import json
-import os.path
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
