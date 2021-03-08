@@ -3,6 +3,5 @@
 *.xml
 *.iml
 *.json
-test.py
 user/data/LoginInfo.json
 *.log
