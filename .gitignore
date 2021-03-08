@@ -3,5 +3,5 @@
 *.xml
 *.iml
 *.json
-user/data/LoginInfo.json
 *.log
+user/data/LoginInfo.json
