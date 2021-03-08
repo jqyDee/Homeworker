@@ -27,7 +27,7 @@ class HomeworkerBot:
         # Web Driver
         options = Options()
         options.add_argument('--headless')
-        self.driver = webdriver.Firefox(executable_path=r"./geckodriver.exe", options=options,
+        self.driver = webdriver.Firefox(executable_path=r"./src/geckodriver.exe", options=options,
                                         log_path="./logs/geckodriver" + self.now
                                                  + ".log")
         self.driver.get("https://homeworker.li/auth")
@@ -160,7 +160,9 @@ class HomeworkerBot:
         while True:
             schedule.run_pending()
             time.sleep(1)
-    
+
     # Add when Class destroyed
+
+
 if __name__ == "__main__":
     HomeworkerBot()
