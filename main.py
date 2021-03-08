@@ -47,7 +47,7 @@ class HomeworkerBot:
         os.system("cls")
 
         try:
-            with open("LoginInfo.json", "r") as f:
+            with open("./user/data/LoginInfo.json", "r") as f:
                 logindata = json.load(f)
                 username = logindata["username"]
                 pw = logindata["pw"]
@@ -58,7 +58,7 @@ class HomeworkerBot:
             pw = str(input("Passwort: "))
             jsondict = {"username": username, "pw": pw}
             print(username + " ; " + pw)
-            with open("LoginInfo.json", "w") as f:
+            with open("user/data/LoginInfo.json", "w") as f:
                 json.dump(jsondict, f)
                 f.close()
 
