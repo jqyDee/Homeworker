@@ -1,6 +1,7 @@
 import logging
 import schedule
-import os, os.path
+import os
+import os.path
 import json
 import time
 
@@ -10,9 +11,17 @@ from selenium.webdriver.firefox.options import Options
 from selenium.common.exceptions import *
 from os import path
 
+"""
+This Program is writing in the Chats at the start of every lesson (10b).
+
+Python 3 and pip is needed.
+
+Before first execution, execute these 2 commands to be able to run the script:
++ pip install selenium 
++ pip install schedule
+"""
 
 class HomeworkerBot:
-
     def __init__(self):
         # Time
         self.now = time.strftime("%d-%m-%Y-%H-%M")
@@ -31,20 +40,26 @@ class HomeworkerBot:
         self.driver.get("https://homeworker.li/auth")
         self.mainwindow = self.driver.window_handles[0]
 
-        # Code
-        self.run_schedule()
-
-    # Functions
     @staticmethod
     def check_log_dir():
+        """
+        Checks if the Directory to store the .log files exist
+        """
+
         currentdir = os.getcwd()
         finaldir = os.path.join(currentdir, r'logs')
         if not path.exists(finaldir):
             os.makedirs(finaldir)
 
     def login(self):
-        os.system("cls")
+        """
+        Logs in with the Login Data stored in LoginInfo.json. It also checks if the
+        JSON file is there in if its empty
 
+        + added Fix that Program doesnt crash when homeworker.li is currently unrecheable
+        """
+
+        # Checks the Json File of Data
         try:
             with open("./user/data/LoginInfo.json", "r") as f:
                 logindata = json.load(f)
@@ -64,6 +79,7 @@ class HomeworkerBot:
         print("Logging in!")
         time.sleep(5)
 
+        # While and Try loop to prevent crash when homeworker.li is unreachable
         while True:
             try:
                 self.driver.refresh()
@@ -88,7 +104,7 @@ class HomeworkerBot:
                     alert = self.driver.switch_to.alert
                     alert.accept()
                     time.sleep(5)
-                except Exception as e:
+                except:
                     print("Error Message: No Alert detected!")
                     pass
 
@@ -108,7 +124,7 @@ class HomeworkerBot:
                         alert = self.driver.switch_to.alert
                         alert.accept()
                         time.sleep(5)
-                    except Exception as e:
+                    except:
                         pass
 
                     self.driver.refresh()
@@ -124,6 +140,12 @@ class HomeworkerBot:
                 continue
 
     def write_to_chat(self, chatfach, msg="Morgen"):
+        """
+        Function to write the Message in a certain chat.
+
+        - Program (still) not working properly when homeworker not reachable
+        """
+
         while True:
             try:
                 print("Start Writing MSG to Chat: " + chatfach + "!")
@@ -153,7 +175,12 @@ class HomeworkerBot:
                 time.sleep(30)
                 continue
 
-    def run_schedule(self):
+    def start(self):
+        """
+        Function which is running all the time, to start the write_in_chat Function
+        at the right time stemps
+        """
+
         self.login()
 
         # Montag - Done
@@ -161,7 +188,7 @@ class HomeworkerBot:
         schedule.every().monday.at("08:47").do(lambda: self.write_to_chat("10B Deutsch Pfeiffer"))  # Deutsch
         schedule.every().monday.at("09:47").do(lambda: self.write_to_chat("Chemie 10b"))  # Chemie
         schedule.every().monday.at("11:33").do(
-            lambda: self.write_to_chat("10b_Sozialkunde/Geschichte_Mayer"))  # Geschichte/Sozi
+                        lambda: self.write_to_chat("10b_Sozialkunde/Geschichte_Mayer"))  # Geschichte/Sozi
 
         # Dienstag - Done
         schedule.every().tuesday.at("08:03").do(lambda: self.write_to_chat("10b Mathe scf"))  # Mathe
@@ -191,7 +218,7 @@ class HomeworkerBot:
         schedule.every().wednesday.at("13:14").do(lambda: self.write_to_chat("Kunst 10b"))  # Test
         schedule.every().wednesday.at("12:51").do(lambda: self.write_to_chat("10b Englisch Janker"))  # Test
 
-        # Run
+        # Run Schedule
         logging.info("Schedule Running!")
         print("Schedule Running!")
         while True:
@@ -200,4 +227,5 @@ class HomeworkerBot:
 
 
 if __name__ == "__main__":
-    HomeworkerBot()
+    app = HomeworkerBot()
+    app.start()
