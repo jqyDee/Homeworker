@@ -1,12 +1,13 @@
 import logging
 import schedule
-import time
 import os, os.path
 import json
+import time
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
+from selenium.common.exceptions import *
 from os import path
 
 
@@ -24,11 +25,11 @@ class HomeworkerBot:
 
         # Web Driver
         options = Options()
-        options.add_argument('--headless')
+        options.add_argument('')
         self.driver = webdriver.Firefox(executable_path=r"./src/geckodriver.exe", options=options,
-                                        log_path="./logs/geckodriver" + self.now
-                                                 + ".log")
+                                        service_log_path="./logs/geckodriver" + self.now + ".log")
         self.driver.get("https://homeworker.li/auth")
+        self.mainwindow = self.driver.window_handles[0]
 
         # Code
         self.run_schedule()
@@ -63,60 +64,94 @@ class HomeworkerBot:
         print("Logging in!")
         time.sleep(5)
 
-        # Accept Cookies
-        self.driver.find_element_by_xpath("/html/body/div[4]/div/div[6]/span[2]").click()
+        while True:
+            try:
+                self.driver.refresh()
 
-        time.sleep(5)
+                try:
+                    # Accept Cookies
+                    self.driver.find_element_by_xpath("/html/body/div[4]/div/div[6]/span[2]").click()
+                except NoSuchElementException:
+                    pass
 
-        # Type Username
-        self.driver.find_element_by_xpath("/html/body/div[1]/div/div/div[3]/form/div/input").send_keys(username,
-                                                                                                       Keys.RETURN)
+                time.sleep(5)
 
-        time.sleep(5)
+                # Type Username
+                self.driver.find_element_by_xpath("//input[@type='email']").send_keys(username, Keys.RETURN)
+                time.sleep(5)
 
-        # Type Password
-        self.driver.find_element_by_xpath("/html/body/div[1]/div/div/div[3]/form/div/input").send_keys(pw, Keys.RETURN)
+                # Type Password
+                self.driver.find_element_by_xpath("//input[@type='password']").send_keys(pw, Keys.RETURN)
+                time.sleep(5)
 
-        logging.info("Succesfully Logged in!")
-        print("Logged in!")
+                try:
+                    alert = self.driver.switch_to.alert
+                    alert.accept()
+                    time.sleep(5)
+                except Exception as e:
+                    print("Error Message: No Alert detected!")
+                    pass
 
-        time.sleep(10)
+                self.driver.refresh()
+                time.sleep(5)
 
-        try:
-            alert = self.driver.switch_to.alert
-            alert.accept()
-        except:
-            pass
+                if self.driver.current_url == "https://homeworker.li/dashboard":
+                    print("Url Changed to: https://homeworker.li/dashboard")
+                    logging.info("Succesfully Logged in!")
+                    print("Logged in!")
+                    os.system("cls")
+                    break
+            except Exception as e:
+                if self.driver.current_url == "https://homeworker.li/dashboard":
 
-        time.sleep(10)
-        self.driver.refresh()
-        time.sleep(5)
-        os.system("cls")
+                    try:
+                        alert = self.driver.switch_to.alert
+                        alert.accept()
+                        time.sleep(5)
+                    except Exception as e:
+                        pass
+
+                    self.driver.refresh()
+                    time.sleep(5)
+
+                    print("Url Changed to: https://homeworker.li/dashboard")
+                    logging.info("Succesfully Logged in!")
+                    print("Logged in!")
+                    os.system("cls")
+                    break
+                print("Error", e)
+                time.sleep(30)
+                continue
 
     def write_to_chat(self, chatfach, msg="Morgen"):
-        print("Start Writing MSG to Chat: " + chatfach + "!")
-        self.driver.refresh()
-        time.sleep(10)
+        while True:
+            try:
+                print("Start Writing MSG to Chat: " + chatfach + "!")
+                self.driver.refresh()
+                time.sleep(5)
 
-        # Go to Chat
-        self.driver.find_element_by_xpath("/html/body/div[25]/div[3]/nav/a[3]").click()
+                # Go to Chat
+                self.driver.find_element_by_xpath("/html/body/div[25]/div[3]/nav/a[3]").click()
+                time.sleep(5)
 
-        time.sleep(5)
+                # Go in certain Chat
+                self.driver.find_element_by_xpath("//*[contains(text(), '" + chatfach + "')]").click()
+                time.sleep(5)
 
-        # Go in Last Written Chat
-        self.driver.find_element_by_xpath("//*[contains(text(), '" + chatfach + "')]").click()
+                # Send Message in Chat
+                self.driver.find_element_by_xpath("//*[@id='']").send_keys(msg)
 
-        time.sleep(5)
-
-        # Send Message in Chat
-        self.driver.find_element_by_xpath("//*[@id='new-text-message']").send_keys(msg, Keys.RETURN)
-
-        chatname = self.driver.find_element_by_xpath("//*[@id='chat-name']").text
-        timenow = time.strftime("%H:%M")
-        print("Message: '" + msg + "' send to Chat: '" + str(chatname) + "' at: '" + timenow + "'")
-        logging.info("Message: '" + msg + "' send to Chat: '" + str(chatname) + "' at: '" + timenow + "'")
-        time.sleep(5)
-        self.driver.back()
+                chatname = self.driver.find_element_by_xpath("//*[@id='chat-name']").text
+                timenow = time.strftime("%H:%M")
+                time.sleep(5)
+                self.driver.close()
+                print("Message: '" + msg + "' send to Chat: '" + str(chatname) + "' at: '" + timenow + "'")
+                logging.info("Message: '" + msg + "' send to Chat: '" + str(chatname) + "' at: '" + timenow + "'")
+                break
+            except Exception as e:
+                print("Error", e)
+                time.sleep(30)
+                continue
 
     def run_schedule(self):
         self.login()
@@ -152,14 +187,16 @@ class HomeworkerBot:
         schedule.every().friday.at("10:33").do(lambda: self.write_to_chat("10b Englisch Janker", "Morning"))  # Englisch
         schedule.every().friday.at("11:33").do(lambda: self.write_to_chat("10b wr und geo"))  # Geographie
 
+        # Test
+        schedule.every().wednesday.at("13:14").do(lambda: self.write_to_chat("Kunst 10b"))  # Test
+        schedule.every().wednesday.at("12:51").do(lambda: self.write_to_chat("10b Englisch Janker"))  # Test
+
         # Run
         logging.info("Schedule Running!")
         print("Schedule Running!")
         while True:
             schedule.run_pending()
             time.sleep(1)
-
-    # Add when Class destroyed
 
 
 if __name__ == "__main__":
