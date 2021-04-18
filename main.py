@@ -10,10 +10,10 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
 from selenium.common.exceptions import *
 from os import path
+from getpass import getpass
 
 """
 This Program is writing in the Chats at the start of every lesson (10b).
-
 Python 3 and pip is needed.
 
 Before first execution, execute these 2 commands to be able to run the script:
@@ -21,24 +21,24 @@ Before first execution, execute these 2 commands to be able to run the script:
 + pip install schedule
 """
 
+
 class HomeworkerBot:
     def __init__(self):
         # Time
-        self.now = time.strftime("%d-%m-%Y-%H-%M")
+        now = time.strftime("%d-%m-%Y-%H-%M")
 
         # Logging
         self.check_log_dir()
-        logging.basicConfig(filename="./logs/main" + self.now + ".log",
+        logging.basicConfig(filename="./logs/main" + now + ".log",
                             format=' [ %(asctime)s ] [ %(levelname)s ] %(message)s',
                             encoding="utf-8", level=logging.DEBUG)
 
         # Web Driver
         options = Options()
-        options.add_argument('')
+        options.add_argument('')  # delete/add the Argument('--headless'), to hide/show the browser
         self.driver = webdriver.Firefox(executable_path=r"./src/geckodriver.exe", options=options,
-                                        service_log_path="./logs/geckodriver" + self.now + ".log")
+                                        service_log_path="./logs/geckodriver" + now + ".log")
         self.driver.get("https://homeworker.li/auth")
-        self.mainwindow = self.driver.window_handles[0]
 
     @staticmethod
     def check_log_dir():
@@ -65,16 +65,12 @@ class HomeworkerBot:
                 logindata = json.load(f)
                 username = logindata["username"]
                 pw = logindata["pw"]
-                f.close()
-            print(username + " ; " + pw)
         except (FileNotFoundError, json.decoder.JSONDecodeError):
             username = str(input("E-Mail: "))
-            pw = str(input("Passwort: "))
+            pw = str(getpass("Passwort: "))
             jsondict = {"username": username, "pw": pw}
-            print(username + " ; " + pw)
             with open("./user/data/LoginInfo.json", "w") as f:
                 json.dump(jsondict, f)
-                f.close()
 
         print("Logging in!")
         time.sleep(5)
@@ -103,34 +99,32 @@ class HomeworkerBot:
                 try:
                     alert = self.driver.switch_to.alert
                     alert.accept()
+                    print("Alert accepted")
                     time.sleep(5)
-                except:
-                    print("Error Message: No Alert detected!")
+                except NoAlertPresentException:
                     pass
 
                 self.driver.refresh()
                 time.sleep(5)
 
                 if self.driver.current_url == "https://homeworker.li/dashboard":
-                    print("Url Changed to: https://homeworker.li/dashboard")
                     logging.info("Succesfully Logged in!")
                     print("Logged in!")
                     os.system("cls")
                     break
             except Exception as e:
                 if self.driver.current_url == "https://homeworker.li/dashboard":
-
                     try:
                         alert = self.driver.switch_to.alert
                         alert.accept()
+                        print("Alert accepted")
                         time.sleep(5)
-                    except:
+                    except NoAlertPresentException:
                         pass
 
                     self.driver.refresh()
                     time.sleep(5)
 
-                    print("Url Changed to: https://homeworker.li/dashboard")
                     logging.info("Succesfully Logged in!")
                     print("Logged in!")
                     os.system("cls")
@@ -142,18 +136,17 @@ class HomeworkerBot:
     def write_to_chat(self, chatfach, msg="Morgen"):
         """
         Function to write the Message in a certain chat.
-
-        - Program (still) not working properly when homeworker not reachable
         """
 
-        while True:
+        run = 0
+        while run < 5:
             try:
                 print("Start Writing MSG to Chat: " + chatfach + "!")
                 self.driver.refresh()
                 time.sleep(5)
 
                 # Go to Chat
-                self.driver.find_element_by_xpath("/html/body/div[25]/div[3]/nav/a[3]").click()
+                self.driver.find_element_by_xpath("/html/body/div[25]/div/nav/a[3]").click()
                 time.sleep(5)
 
                 # Go in certain Chat
@@ -161,24 +154,24 @@ class HomeworkerBot:
                 time.sleep(5)
 
                 # Send Message in Chat
-                self.driver.find_element_by_xpath("//*[@id='']").send_keys(msg)
+                self.driver.find_element_by_xpath("//*[@id='new-text-message']").send_keys(msg, Keys.RETURN)
 
                 chatname = self.driver.find_element_by_xpath("//*[@id='chat-name']").text
                 timenow = time.strftime("%H:%M")
                 time.sleep(5)
-                self.driver.close()
                 print("Message: '" + msg + "' send to Chat: '" + str(chatname) + "' at: '" + timenow + "'")
                 logging.info("Message: '" + msg + "' send to Chat: '" + str(chatname) + "' at: '" + timenow + "'")
                 break
             except Exception as e:
-                print("Error", e)
+                run += 1
+                print("Error writing message(run: " + str(run) + "): ", e)
                 time.sleep(30)
                 continue
 
     def start(self):
         """
         Function which is running all the time, to start the write_in_chat Function
-        at the right time stemps
+        at the right timestamps
         """
 
         self.login()
@@ -187,8 +180,8 @@ class HomeworkerBot:
         schedule.every().monday.at("08:03").do(lambda: self.write_to_chat("10b Französisch Granet"))  # Franze
         schedule.every().monday.at("08:47").do(lambda: self.write_to_chat("10B Deutsch Pfeiffer"))  # Deutsch
         schedule.every().monday.at("09:47").do(lambda: self.write_to_chat("Chemie 10b"))  # Chemie
-        schedule.every().monday.at("11:33").do(
-                        lambda: self.write_to_chat("10b_Sozialkunde/Geschichte_Mayer"))  # Geschichte/Sozi
+        schedule.every().monday.at("11:33").do(lambda: self.write_to_chat(
+                                                            "10b_Sozialkunde/Geschichte_Mayer"))  # Geschichte/Sozi
 
         # Dienstag - Done
         schedule.every().tuesday.at("08:03").do(lambda: self.write_to_chat("10b Mathe scf"))  # Mathe
@@ -211,12 +204,13 @@ class HomeworkerBot:
         # Freitag - Done
         schedule.every().friday.at("08:03").do(lambda: self.write_to_chat("10b Physik"))  # Physik
         schedule.every().friday.at("09:47").do(lambda: self.write_to_chat("10b Mathe scf"))  # Mathe
-        schedule.every().friday.at("10:33").do(lambda: self.write_to_chat("10b Englisch Janker", "Morning"))  # Englisch
+        schedule.every().friday.at("10:33").do(lambda: self.write_to_chat("10b Englisch Janker",
+                                                                          "Morning"))  # Englisch
         schedule.every().friday.at("11:33").do(lambda: self.write_to_chat("10b wr und geo"))  # Geographie
 
         # Test
-        schedule.every().wednesday.at("13:14").do(lambda: self.write_to_chat("Kunst 10b"))  # Test
-        schedule.every().wednesday.at("12:51").do(lambda: self.write_to_chat("10b Englisch Janker"))  # Test
+        # schedule.every().sunday.at("22:38").do(lambda: self.write_to_chat("Kunst 10b"))  # Test
+        # schedule.every().wednesday.at("12:51").do(lambda: self.write_to_chat("10b Englisch Janker"))  # Test
 
         # Run Schedule
         logging.info("Schedule Running!")
