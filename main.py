@@ -177,10 +177,10 @@ class HomeworkerBot:
         self.login()
 
         # Montag - Done
-        schedule.every().monday.at("08:03").do(lambda: self.write_to_chat("10b Französisch Granet"))  # Franze
-        schedule.every().monday.at("08:47").do(lambda: self.write_to_chat("10B Deutsch Pfeiffer"))  # Deutsch
-        schedule.every().monday.at("09:47").do(lambda: self.write_to_chat("Chemie 10b"))  # Chemie
-        schedule.every().monday.at("11:33").do(lambda: self.write_to_chat(
+        schedule.every().monday.at("08:33").do(lambda: self.write_to_chat("10b Französisch Granet"))  # Franze
+        schedule.every().monday.at("09:13").do(lambda: self.write_to_chat("10b Deutsch Gerlach"))  # Deutsch
+        schedule.every().monday.at("10:07").do(lambda: self.write_to_chat("Chemie 10b"))  # Chemie
+        schedule.every().monday.at("11:43").do(lambda: self.write_to_chat(
                                                             "10b_Sozialkunde/Geschichte_Mayer"))  # Geschichte/Sozi
 
         # Dienstag - Done
@@ -190,9 +190,9 @@ class HomeworkerBot:
                                                                            "Morning"))  # Englisch
 
         # Mittwoch - Done
-        schedule.every().wednesday.at("08:03").do(lambda: self.write_to_chat("10b wr und geo"))  # Wirtschaft und Recht
-        schedule.every().wednesday.at("09:47").do(lambda: self.write_to_chat("10B Deutsch Pfeiffer"))  # Deutsch
-        schedule.every().wednesday.at("11:33").do(lambda: self.write_to_chat("10b_Informatik_Ziegenaus"))  # Informatik
+        schedule.every().wednesday.at("08:33").do(lambda: self.write_to_chat("10b wr und geo"))  # Wirtschaft und Recht
+        schedule.every().wednesday.at("10:07").do(lambda: self.write_to_chat("10b Deutsch Gerlach"))  # Deutsch
+        schedule.every().wednesday.at("11:43").do(lambda: self.write_to_chat("10b_Informatik_Ziegenaus"))  # Informatik
 
         # Donnerstag - Done
         schedule.every().thursday.at("08:03").do(lambda: self.write_to_chat("10b Französisch Granet"))  # Franze
@@ -202,11 +202,10 @@ class HomeworkerBot:
         schedule.every().thursday.at("12:17").do(lambda: self.write_to_chat("Chemie 10b"))  # Chemie Übung
 
         # Freitag - Done
-        schedule.every().friday.at("08:03").do(lambda: self.write_to_chat("10b Physik"))  # Physik
-        schedule.every().friday.at("09:47").do(lambda: self.write_to_chat("10b Mathe scf"))  # Mathe
-        schedule.every().friday.at("10:33").do(lambda: self.write_to_chat("10b Englisch Janker",
-                                                                          "Morning"))  # Englisch
-        schedule.every().friday.at("11:33").do(lambda: self.write_to_chat("10b wr und geo"))  # Geographie
+        schedule.every().friday.at("08:33").do(lambda: self.write_to_chat("10b Physik"))  # Physik
+        schedule.every().friday.at("10:07").do(lambda: self.write_to_chat("10b Englisch Janker", "Morning"))  # Englisch
+        schedule.every().friday.at("10:47").do(lambda: self.write_to_chat("10b Mathe scf"))  # Mathe
+        schedule.every().friday.at("11:43").do(lambda: self.write_to_chat("10b wr und geo"))  # Geographie
 
         # Test
         # schedule.every().sunday.at("22:38").do(lambda: self.write_to_chat("Kunst 10b"))  # Test
