@@ -35,7 +35,7 @@ class HomeworkerBot:
 
         # Web Driver
         options = Options()
-        options.add_argument('')  # delete/add the Argument('--headless'), to hide/show the browser
+        options.add_argument('--headless')  # delete/add the Argument('--headless'), to hide/show the browser
         self.driver = webdriver.Firefox(executable_path=r"./src/geckodriver.exe", options=options,
                                         service_log_path="./logs/geckodriver" + now + ".log")
         self.driver.get("https://homeworker.li/auth")
